@@ -10,24 +10,56 @@ class ServicioVehiculos:
         self.repositorio_clientes = RepositorioClientes()
 
     def registrar_vehiculo(self, vehiculo):
-        clientes = self.repositorio_clientes.listar()
+        cliente = self.repositorio_clientes.buscar_por_id(
+            vehiculo.cliente.id_cliente
+        )
 
-        if not any(
-            fila[0] == vehiculo.cliente.id_cliente
-            for fila in clientes
-        ):
+        if not cliente:
             print("Error: el cliente no está registrado.")
             return False
 
-        vehiculos = self.repositorio.listar()
+        existente = self.repositorio.buscar_por_id(
+            vehiculo.id_vehiculo
+        )
 
-        if any(fila[0] == vehiculo.id_vehiculo for fila in vehiculos):
+        if existente:
             print("El vehículo ya está registrado.")
             return False
 
         self.repositorio.registrar(vehiculo)
-        print("Vehículo registrado correctamente mediante el servicio.")
+        print("Vehículo registrado correctamente.")
         return True
 
     def listar_vehiculos(self):
         return self.repositorio.listar()
+
+    def buscar_vehiculo(self, id_vehiculo):
+        return self.repositorio.buscar_por_id(id_vehiculo)
+
+    def actualizar_vehiculo(self, vehiculo):
+        cliente = self.repositorio_clientes.buscar_por_id(
+            vehiculo.cliente.id_cliente
+        )
+
+        if not cliente:
+            print("Error: el cliente no está registrado.")
+            return False
+
+        actualizado = self.repositorio.actualizar(vehiculo)
+
+        if actualizado:
+            print("Vehículo actualizado correctamente.")
+        else:
+            print("No se encontró el vehículo.")
+
+        return actualizado
+
+    def eliminar_vehiculo(self, id_vehiculo):
+        eliminado = self.repositorio.eliminar(id_vehiculo)
+
+        if eliminado:
+            print("Vehículo eliminado correctamente.")
+        else:
+            print("No se encontró el vehículo.")
+
+        return eliminado

@@ -1,261 +1,394 @@
 
-from modelos.cliente import Cliente
-from modelos.vehiculo import Vehiculo
-from modelos.mecanico import Mecanico
-from modelos.gestor_taller import GestorTaller
-from modelos.orden_reparacion import OrdenReparacion
-from modelos.diagnostico import Diagnostico
-from modelos.mantenimiento import Mantenimiento
-from modelos.detalle_reparacion import DetalleReparacion
-from modelos.repuesto import Repuesto
-from modelos.alerta_mantenimiento import AlertaMantenimiento
-from repositories.reparaciones import RepositorioReparaciones
-from repositories.diagnosticos import RepositorioDiagnosticos
-from repositories.mantenimientos import RepositorioMantenimientos
-from repositories.detalles_reparacion import RepositorioDetallesReparacion
-from repositories.repuestos import RepositorioRepuestos
-from repositories.alertas import RepositorioAlertas
-from servicios.servicio_clientes import ServicioClientes
-from servicios.servicio_vehiculos import ServicioVehiculos
-from servicios.servicio_reparaciones import ServicioReparaciones
-from servicios.servicio_inventario import ServicioInventario
-from servicios.servicio_mantenimiento import ServicioMantenimiento
 from datos.crear_tablas import crear_tablas
+from modelos.cliente import Cliente
+from servicios.servicio_clientes import ServicioClientes
+from modelos.vehiculo import Vehiculo
+from servicios.servicio_vehiculos import ServicioVehiculos
+from servicios.servicio_clientes import ServicioClientes
+from modelos.mecanico import Mecanico
+from servicios.servicio_mecanicos import ServicioMecanicos
+from modelos.orden_reparacion import OrdenReparacion
+from servicios.servicio_reparaciones import ServicioReparaciones
+
 
-# Crear las tablas antes de utilizar los servicios
-crear_tablas()
-
-# Crear el taller
-taller = GestorTaller("AutoCare")
-
-# Crear cliente
-cliente1 = Cliente(1, "Juan Pérez", "1123456789", "juan@gmail.com")
-
-# Crear vehículo
-vehiculo1 = Vehiculo(
-    1, "Toyota", "Corolla", "AB123CD", 2022, cliente1
-)
-
-# Crear mecánicos
-mecanico1 = Mecanico(
-    1, "Carlos López", "Mecánica general", "1122233344"
-)
-
-mecanico2 = Mecanico(
-    2, "Pedro Gómez", "Electricidad automotriz", "1144455566"
-)
-
-# Registrar mediante los servicios
-servicio_clientes = ServicioClientes()
-servicio_vehiculos = ServicioVehiculos()
-
-servicio_clientes.registrar_cliente(cliente1)
-servicio_vehiculos.registrar_vehiculo(vehiculo1)
-
-taller.registrar_cliente(cliente1)
-taller.registrar_vehiculo(vehiculo1)
-taller.registrar_mecanico(mecanico1)
-taller.registrar_mecanico(mecanico2)
-
-
-# Crear orden de reparación
-orden1 = OrdenReparacion(
-    1, vehiculo1, "18/11/2026",
-    "Revisión del motor y sistema eléctrico"
-)
-
-orden1.asignar_mecanico(mecanico1)
-orden1.asignar_mecanico(mecanico2)
-
-servicio_reparaciones = ServicioReparaciones()
-servicio_reparaciones.registrar_orden(orden1)
-
-taller.registrar_orden(orden1)
-
-# Crear diagnóstico
-diagnostico1 = Diagnostico(
-    1,
-    orden1,
-    "18/11/2026",
-    "Falla en el motor",
-    "Se detectó ruido anormal y vibración"
-)
-taller.registrar_diagnostico(diagnostico1)
-
-# Crear el servicio de mantenimiento
-servicio_mantenimiento = ServicioMantenimiento()
-
-# Crear mantenimiento preventivo
-mantenimiento1 = Mantenimiento(
-    1,
-    vehiculo1,
-    "20/11/2026",
-    "Preventivo",
-    "Cambio de aceite y revisión de filtros",
-    45000
-)
+def menu_clientes():
+    servicio = ServicioClientes()
+
+    while True:
+        print("\n========== GESTIÓN DE CLIENTES ==========")
+        print("1. Registrar cliente")
+        print("2. Listar clientes")
+        print("3. Buscar cliente")
+        print("4. Actualizar cliente")
+        print("5. Eliminar cliente")
+        print("0. Volver al menú principal")
 
-servicio_mantenimiento.registrar_mantenimiento(mantenimiento1)
-taller.registrar_mantenimiento(mantenimiento1)
+        opcion = input("Selecciona una opción: ")
 
-# Crear detalle de reparación
-detalle1 = DetalleReparacion(
-    1,
-    orden1,
-    "Reparación del motor",
-    3,
-    15000
-)
-taller.registrar_detalle(detalle1)
+        if opcion == "0":
+            break
 
-# Crear repuesto
-repuesto1 = Repuesto(
-    1,
-    "Filtro de aceite",
-    "Filtro para Toyota Corolla",
-    12000,
-    10
-)
+        elif opcion == "1":
+            print("\nREGISTRAR CLIENTE")
 
-servicio_inventario = ServicioInventario()
-servicio_inventario.registrar_repuesto(repuesto1)
+            id_cliente = int(input("ID del cliente: "))
+            nombre = input("Nombre: ")
+            telefono = input("Teléfono: ")
+            correo = input("Correo: ")
 
-taller.registrar_repuesto(repuesto1)
+            cliente = Cliente(
+                id_cliente, nombre, telefono, correo
+            )
 
-# Crear alerta de mantenimiento
-alerta1 = AlertaMantenimiento(
-    1,
-    vehiculo1,
-    "20/12/2026",
-    "Recordatorio: realizar cambio de aceite",
-    50000
-)
-servicio_mantenimiento.registrar_alerta(alerta1)
+            servicio.registrar_cliente(cliente)
+
+        elif opcion == "2":
+            print("\nLISTA DE CLIENTES")
 
-taller.registrar_alerta(alerta1)
+            for cliente in servicio.listar_clientes():
+                print(cliente)
 
+        elif opcion == "3":
+            id_cliente = int(input("ID del cliente que buscas: "))
+            cliente = servicio.buscar_cliente(id_cliente)
 
-# Mostrar información
-orden1.mostrar_informacion()
-diagnostico1.mostrar_informacion()
-mantenimiento1.mostrar_informacion()
-detalle1.mostrar_informacion()
-repuesto1.mostrar_informacion()
-alerta1.mostrar_informacion()
+            if cliente:
+                print(cliente)
+            else:
+                print("Cliente no encontrado.")
 
-# Probar actualización del inventario
-print("\n=== PRUEBA DE INVENTARIO ===")
-repuesto1.actualizar_stock(-2)
-servicio_inventario.actualizar_stock(
-    repuesto1.id_repuesto,
-    repuesto1.cantidad_stock
-)
-repuesto1.mostrar_informacion()
+        elif opcion == "4":
+            print("\nACTUALIZAR CLIENTE")
 
-# Probar alerta
-print("\n=== PRUEBA DE ALERTA ===")
-alerta1.marcar_completada()
-alerta1.mostrar_informacion()
+            id_cliente = int(input("ID del cliente: "))
+            nombre = input("Nuevo nombre: ")
+            telefono = input("Nuevo teléfono: ")
+            correo = input("Nuevo correo: ")
 
-print()
-taller.mostrar_resumen()
+            cliente = Cliente(
+                id_cliente, nombre, telefono, correo
+            )
 
-from datos.conexion import conectar
+            servicio.actualizar_cliente(cliente)
+
+        elif opcion == "5":
+            id_cliente = int(input("ID del cliente que deseas eliminar: "))
+            servicio.eliminar_cliente(id_cliente)
 
-# Probar conexión con SQLite
-conexion = conectar()
-print("\nBase de datos AutoCare conectada correctamente.")
-conexion.close()
+        else:
+            print("Opción no válida.")
 
 
+def menu_vehiculos():
+    servicio = ServicioVehiculos()
 
-from repositories.clientes import RepositorioClientes
+    while True:
+        print("\n========== GESTIÓN DE VEHÍCULOS ==========")
+        print("1. Registrar vehículo")
+        print("2. Listar vehículos")
+        print("3. Buscar vehículo")
+        print("4. Actualizar vehículo")
+        print("5. Eliminar vehículo")
+        print("0. Volver al menú principal")
 
-# Consultar clientes guardados en SQLite
-print("\n=== CLIENTES GUARDADOS EN SQLITE ===")
+        opcion = input("Selecciona una opción: ")
 
-for cliente in servicio_clientes.listar_clientes():
-    print(cliente)
+        if opcion == "0":
+            break
 
-from repositories.vehiculos import RepositorioVehiculos
+        elif opcion == "1":
+            print("\nREGISTRAR VEHÍCULO")
 
-# Probar el repositorio de vehículos
-# Consultar vehículos guardados en SQLite
-print("\n=== VEHÍCULOS GUARDADOS EN SQLITE ===")
+            id_vehiculo = int(input("ID del vehículo: "))
+            marca = input("Marca: ")
+            modelo = input("Modelo: ")
+            patente = input("Patente: ")
+            anio = int(input("Año: "))
+            id_cliente = int(input("ID del propietario: "))
+
+            cliente = Cliente(
+                id_cliente, "", "", ""
+            )
 
-for vehiculo in servicio_vehiculos.listar_vehiculos():
-    print(vehiculo)
+            vehiculo = Vehiculo(
+                id_vehiculo, marca, modelo,
+                patente, anio, cliente
+            )
 
+            servicio.registrar_vehiculo(vehiculo)
 
+        elif opcion == "2":
+            print("\nLISTA DE VEHÍCULOS")
 
-from repositories.mecanicos import RepositorioMecanicos
+            for vehiculo in servicio.listar_vehiculos():
+                print(vehiculo)
 
-# Probar el repositorio de mecánicos
-repositorio_mecanicos = RepositorioMecanicos()
+        elif opcion == "3":
+            id_vehiculo = int(input("ID del vehículo: "))
+            vehiculo = servicio.buscar_vehiculo(id_vehiculo)
 
-mecanicos_guardados = repositorio_mecanicos.listar()
+            if vehiculo:
+                print(vehiculo)
+            else:
+                print("Vehículo no encontrado.")
 
-for mecanico in [mecanico1, mecanico2]:
-    if not any(fila[0] == mecanico.id_mecanico for fila in mecanicos_guardados):
-        repositorio_mecanicos.registrar(mecanico)
+        elif opcion == "4":
+            print("\nACTUALIZAR VEHÍCULO")
 
-print("\n=== MECÁNICOS GUARDADOS EN SQLITE ===")
+            id_vehiculo = int(input("ID del vehículo: "))
+            marca = input("Nueva marca: ")
+            modelo = input("Nuevo modelo: ")
+            patente = input("Nueva patente: ")
+            anio = int(input("Nuevo año: "))
+            id_cliente = int(input("ID del propietario: "))
+
+            cliente = Cliente(
+                id_cliente, "", "", ""
+            )
+
+            vehiculo = Vehiculo(
+                id_vehiculo, marca, modelo,
+                patente, anio, cliente
+            )
 
-for mecanico in repositorio_mecanicos.listar():
-    print(mecanico)
+            servicio.actualizar_vehiculo(vehiculo)
 
+        elif opcion == "5":
+            id_vehiculo = int(input("ID del vehículo que deseas eliminar: "))
+            servicio.eliminar_vehiculo(id_vehiculo)
 
-# Consultar órdenes guardadas en SQLite
-print("\n=== ÓRDENES GUARDADAS EN SQLITE ===")
+        else:
+            print("Opción no válida.")
 
-for orden in servicio_reparaciones.listar_ordenes():
-    print(orden)
+def menu_mecanicos():
+    servicio = ServicioMecanicos()
 
-repositorio_reparaciones = RepositorioReparaciones()
-print("\n=== MECÁNICOS ASIGNADOS A LA ORDEN ===")
+    while True:
+        print("\n========== GESTIÓN DE MECÁNICOS ==========")
+        print("1. Registrar mecánico")
+        print("2. Listar mecánicos")
+        print("3. Buscar mecánico")
+        print("4. Actualizar mecánico")
+        print("5. Eliminar mecánico")
+        print("0. Volver al menú principal")
 
-for mecanico in repositorio_reparaciones.listar_mecanicos(1):
-    print(mecanico)
+        opcion = input("Selecciona una opción: ")
 
+        if opcion == "0":
+            break
 
-## Consultar diagnósticos guardados en SQLite
+        elif opcion == "1":
+            print("\nREGISTRAR MECÁNICO")
 
-repositorio_diagnosticos = RepositorioDiagnosticos()
-print("\n=== DIAGNÓSTICOS GUARDADOS EN SQLITE ===")
+            id_mecanico = int(input("ID del mecánico: "))
+            nombre = input("Nombre: ")
+            especialidad = input("Especialidad: ")
+            telefono = input("Teléfono: ")
 
-for diagnostico in repositorio_diagnosticos.listar():
-    print(diagnostico)
+            mecanico = Mecanico(
+                id_mecanico, nombre, especialidad, telefono
+            )
 
-# Consultar mantenimientos guardados en SQLite
-print("\n=== MANTENIMIENTOS GUARDADOS EN SQLITE ===")
+            servicio.registrar_mecanico(mecanico)
 
-for mantenimiento in servicio_mantenimiento.listar_mantenimientos():
-    print(mantenimiento)
+        elif opcion == "2":
+            print("\nLISTA DE MECÁNICOS")
 
+            for mecanico in servicio.listar_mecanicos():
+                print(mecanico)
 
-# Probar repositorio de detalles de reparación
-repositorio_detalles = RepositorioDetallesReparacion()
+        elif opcion == "3":
+            id_mecanico = int(input("ID del mecánico: "))
+            mecanico = servicio.buscar_mecanico(id_mecanico)
 
-detalles_guardados = repositorio_detalles.listar()
+            if mecanico:
+                print(mecanico)
+            else:
+                print("Mecánico no encontrado.")
 
-if not any(fila[0] == detalle1.id_detalle for fila in detalles_guardados):
-    repositorio_detalles.registrar(detalle1)
+        elif opcion == "4":
+            print("\nACTUALIZAR MECÁNICO")
 
-print("\n=== DETALLES DE REPARACIÓN GUARDADOS EN SQLITE ===")
+            id_mecanico = int(input("ID del mecánico: "))
+            nombre = input("Nuevo nombre: ")
+            especialidad = input("Nueva especialidad: ")
+            telefono = input("Nuevo teléfono: ")
 
-for detalle in repositorio_detalles.listar():
-    print(detalle)
+            mecanico = Mecanico(
+                id_mecanico, nombre, especialidad, telefono
+            )
 
+            servicio.actualizar_mecanico(mecanico)
 
-# Consultar repuestos guardados en SQLite
-print("\n=== REPUESTOS GUARDADOS EN SQLITE ===")
+        elif opcion == "5":
+            id_mecanico = int(input("ID del mecánico que deseas eliminar: "))
+            servicio.eliminar_mecanico(id_mecanico)
 
-for repuesto in servicio_inventario.listar_repuestos():
-    print(repuesto)
+        else:
+            print("Opción no válida.")
 
+def menu_ordenes():
+    servicio = ServicioReparaciones()
+    servicio_vehiculos = ServicioVehiculos()
+    servicio_mecanicos = ServicioMecanicos()
 
-# Consultar alertas guardadas en SQLite
-print("\n=== ALERTAS DE MANTENIMIENTO GUARDADAS EN SQLITE ===")
+    while True:
+        print("\n========== GESTIÓN DE ÓRDENES ==========")
+        print("1. Registrar orden")
+        print("2. Listar órdenes")
+        print("3. Buscar orden")
+        print("4. Actualizar orden")
+        print("5. Eliminar orden")
+        print("0. Volver al menú principal")
+
+        opcion = input("Selecciona una opción: ")
+
+        if opcion == "0":
+            break
+
+        elif opcion == "1":
+            print("\nREGISTRAR ORDEN")
+
+            id_orden = int(input("ID de la orden: "))
+            id_vehiculo = int(input("ID del vehículo: "))
+
+            if not servicio_vehiculos.buscar_vehiculo(id_vehiculo):
+                print("El vehículo no existe.")
+                continue
+
+            fecha = input("Fecha (DD/MM/AAAA): ")
+            descripcion = input("Descripción de la reparación: ")
+
+            id_mecanico = int(input("ID del mecánico asignado: "))
 
-for alerta in servicio_mantenimiento.listar_alertas():
-    print(alerta)
+            if not servicio_mecanicos.buscar_mecanico(id_mecanico):
+                print("El mecánico no existe.")
+                continue
+
+            vehiculo = Vehiculo(
+                id_vehiculo, "", "", "", 0, None
+            )
+
+            orden = OrdenReparacion(
+                id_orden, vehiculo, fecha, descripcion
+            )
+
+            mecanico = Mecanico(
+                id_mecanico, "", "", ""
+            )
+
+            orden.asignar_mecanico(mecanico)
+            servicio.registrar_orden(orden)
+
+        elif opcion == "2":
+            print("\nLISTA DE ÓRDENES")
+
+            for orden in servicio.listar_ordenes():
+                print(orden)
+
+        elif opcion == "3":
+            id_orden = int(input("ID de la orden: "))
+            orden = servicio.buscar_orden(id_orden)
+
+            if orden:
+                print(orden)
+                print("Mecánicos asignados:")
+                for mecanico in servicio.listar_mecanicos_asignados(id_orden):
+                    print(mecanico)
+            else:
+                print("Orden no encontrada.")
+
+        elif opcion == "4":
+            print("\nACTUALIZAR ORDEN")
+
+            id_orden = int(input("ID de la orden: "))
+            id_vehiculo = int(input("ID del vehículo: "))
+
+            fecha = input("Nueva fecha (DD/MM/AAAA): ")
+            descripcion = input("Nueva descripción: ")
+            estado = input("Nuevo estado: ")
+
+            vehiculo = Vehiculo(
+                id_vehiculo, "", "", "", 0, None
+            )
+
+            orden = OrdenReparacion(
+                id_orden, vehiculo, fecha, descripcion
+            )
+
+            orden.cambiar_estado(estado)
+            servicio.actualizar_orden(orden)
+
+        elif opcion == "5":
+            id_orden = int(input("ID de la orden que deseas eliminar: "))
+            servicio.eliminar_orden(id_orden)
+
+        else:
+            print("Opción no válida.")
+def mostrar_menu():
+    print("\n" + "=" * 45)
+    print("             AUTOCARE")
+    print(" Sistema de Diagnóstico y Mantenimiento")
+    print("=" * 45)
+    print("1. Gestionar clientes")
+    print("2. Gestionar vehículos")
+    print("3. Gestionar mecánicos")
+    print("4. Gestionar órdenes de reparación")
+    print("5. Gestionar diagnósticos")
+    print("6. Gestionar mantenimientos")
+    print("7. Gestionar detalles de reparación")
+    print("8. Gestionar repuestos e inventario")
+    print("9. Gestionar alertas de mantenimiento")
+    print("10. Consultar estadísticas")
+    print("0. Salir")
+    print("=" * 45)
+
+
+def main():
+    crear_tablas()
+
+    while True:
+        mostrar_menu()
+
+        opcion = input("Selecciona una opción: ")
+
+        if opcion == "0":
+            print("\nGracias por utilizar AutoCare.")
+            break
+
+        elif opcion == "1":
+             menu_clientes()
+
+        elif opcion == "2":
+            menu_vehiculos()
+
+        elif opcion == "3":
+            menu_mecanicos()
+
+        elif opcion == "4":
+            menu_ordenes()
+
+        elif opcion == "5":
+            menu_diagnosticos()
+
+        elif opcion == "6":
+            print("\nGESTIÓN DE MANTENIMIENTOS")
+
+        elif opcion == "7":
+            print("\nGESTIÓN DE DETALLES DE REPARACIÓN")
+
+        elif opcion == "8":
+            print("\nGESTIÓN DE REPUESTOS E INVENTARIO")
+
+        elif opcion == "9":
+            print("\nGESTIÓN DE ALERTAS DE MANTENIMIENTO")
+
+        elif opcion == "10":
+            print("\nESTADÍSTICAS DE AUTOCARE")
+
+        else:
+            print("\nOpción no válida. Intenta nuevamente.")
+
+
+if __name__ == "__main__":
+    main()

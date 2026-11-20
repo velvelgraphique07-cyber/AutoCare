@@ -12,38 +12,72 @@ class ServicioMantenimiento:
         self.repositorio_vehiculos = RepositorioVehiculos()
 
     def registrar_mantenimiento(self, mantenimiento):
-        vehiculos = self.repositorio_vehiculos.listar()
+        vehiculo = self.repositorio_vehiculos.buscar_por_id(
+            mantenimiento.vehiculo.id_vehiculo
+        )
 
-        if not any(
-            fila[0] == mantenimiento.vehiculo.id_vehiculo
-            for fila in vehiculos
-        ):
+        if not vehiculo:
             print("Error: el vehículo no está registrado.")
             return False
 
-        mantenimientos = self.repositorio_mantenimientos.listar()
+        existente = self.repositorio_mantenimientos.buscar_por_id(
+            mantenimiento.id_mantenimiento
+        )
 
-        if any(
-            fila[0] == mantenimiento.id_mantenimiento
-            for fila in mantenimientos
-        ):
+        if existente:
             print("El mantenimiento ya está registrado.")
             return False
 
         self.repositorio_mantenimientos.registrar(mantenimiento)
-        print("Mantenimiento registrado correctamente mediante el servicio.")
+        print("Mantenimiento registrado correctamente.")
         return True
 
     def listar_mantenimientos(self):
         return self.repositorio_mantenimientos.listar()
 
-    def registrar_alerta(self, alerta):
-        vehiculos = self.repositorio_vehiculos.listar()
+    def buscar_mantenimiento(self, id_mantenimiento):
+        return self.repositorio_mantenimientos.buscar_por_id(
+            id_mantenimiento
+        )
 
-        if not any(
-            fila[0] == alerta.vehiculo.id_vehiculo
-            for fila in vehiculos
-        ):
+    def actualizar_mantenimiento(self, mantenimiento):
+        vehiculo = self.repositorio_vehiculos.buscar_por_id(
+            mantenimiento.vehiculo.id_vehiculo
+        )
+
+        if not vehiculo:
+            print("Error: el vehículo no está registrado.")
+            return False
+
+        actualizado = self.repositorio_mantenimientos.actualizar(
+            mantenimiento
+        )
+
+        if actualizado:
+            print("Mantenimiento actualizado correctamente.")
+        else:
+            print("No se encontró el mantenimiento.")
+
+        return actualizado
+
+    def eliminar_mantenimiento(self, id_mantenimiento):
+        eliminado = self.repositorio_mantenimientos.eliminar(
+            id_mantenimiento
+        )
+
+        if eliminado:
+            print("Mantenimiento eliminado correctamente.")
+        else:
+            print("No se encontró el mantenimiento.")
+
+        return eliminado
+
+    def registrar_alerta(self, alerta):
+        vehiculo = self.repositorio_vehiculos.buscar_por_id(
+            alerta.vehiculo.id_vehiculo
+        )
+
+        if not vehiculo:
             print("Error: el vehículo no está registrado.")
             return False
 
@@ -54,8 +88,40 @@ class ServicioMantenimiento:
             return False
 
         self.repositorio_alertas.registrar(alerta)
-        print("Alerta registrada correctamente mediante el servicio.")
+        print("Alerta registrada correctamente.")
         return True
 
     def listar_alertas(self):
         return self.repositorio_alertas.listar()
+    
+    def buscar_alerta(self, id_alerta):
+        return self.repositorio_alertas.buscar_por_id(id_alerta)
+
+    def actualizar_alerta(self, alerta):
+        vehiculo = self.repositorio_vehiculos.buscar_por_id(
+            alerta.vehiculo.id_vehiculo
+        )
+
+        if not vehiculo:
+            print("Error: el vehículo no está registrado.")
+            return False
+
+        actualizado = self.repositorio_alertas.actualizar(alerta)
+
+        if actualizado:
+            print("Alerta actualizada correctamente.")
+        else:
+            print("No se encontró la alerta.")
+
+        return actualizado
+
+    def eliminar_alerta(self, id_alerta):
+        eliminado = self.repositorio_alertas.eliminar(id_alerta)
+
+        if eliminado:
+            print("Alerta eliminada correctamente.")
+        else:
+            print("No se encontró la alerta.")
+
+        return eliminado
+

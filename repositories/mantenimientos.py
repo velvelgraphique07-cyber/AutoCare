@@ -1,3 +1,4 @@
+
 from datos.conexion import conectar
 
 
@@ -47,5 +48,57 @@ class RepositorioMantenimientos:
         mantenimientos = cursor.fetchall()
 
         conexion.close()
-
         return mantenimientos
+
+    def buscar_por_id(self, id_mantenimiento):
+        conexion = conectar()
+        cursor = conexion.cursor()
+
+        cursor.execute(
+            "SELECT * FROM mantenimientos WHERE id_mantenimiento = ?",
+            (id_mantenimiento,)
+        )
+
+        mantenimiento = cursor.fetchone()
+        conexion.close()
+        return mantenimiento
+
+    def actualizar(self, mantenimiento):
+        conexion = conectar()
+        cursor = conexion.cursor()
+
+        cursor.execute("""
+            UPDATE mantenimientos
+            SET id_vehiculo = ?, fecha = ?, tipo = ?,
+                descripcion = ?, kilometraje = ?, estado = ?
+            WHERE id_mantenimiento = ?
+        """, (
+            mantenimiento.vehiculo.id_vehiculo,
+            mantenimiento.fecha,
+            mantenimiento.tipo,
+            mantenimiento.descripcion,
+            mantenimiento.kilometraje,
+            mantenimiento.estado,
+            mantenimiento.id_mantenimiento
+        ))
+
+        conexion.commit()
+        actualizado = cursor.rowcount > 0
+        conexion.close()
+
+        return actualizado
+
+    def eliminar(self, id_mantenimiento):
+        conexion = conectar()
+        cursor = conexion.cursor()
+
+        cursor.execute(
+            "DELETE FROM mantenimientos WHERE id_mantenimiento = ?",
+            (id_mantenimiento,)
+        )
+
+        conexion.commit()
+        eliminado = cursor.rowcount > 0
+        conexion.close()
+
+        return eliminado
