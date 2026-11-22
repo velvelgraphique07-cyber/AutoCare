@@ -1,3 +1,5 @@
+import sys
+
 from datos.crear_tablas import crear_tablas
 from modelos.cliente import Cliente
 from servicios.servicio_clientes import ServicioClientes
@@ -575,4 +577,13 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if "--gui" in sys.argv:
+        crear_tablas()
+        import tkinter as tk
+        from interfaz.ventana_principal import VentanaPrincipal
+
+        root = tk.Tk()
+        VentanaPrincipal(root)
+        root.mainloop()
+    else:
+        main()
